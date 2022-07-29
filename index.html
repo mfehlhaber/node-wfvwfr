@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<!-- <html data-theme="dark"> -->
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Alpine.js Experiments</title>
+  <script src="https://unpkg.com/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.2/cdn.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+  <header class="container">
+    <hgroup>
+      <h1>Alpine.js Demo</h1>
+      <h2>Using Pico design system.</h2>
+    </hgroup>
+  </header>
+
+  <main class="container">
+    <!-- 
+    <iframe id="pocketbase" title="PocketBase" width="510" height="305" src="http://localhost:8090/_/">
+    </iframe>
+    -->
+
+    <!-- x-data - Declare a new Alpine component and its data for a block of HTML -->
+    <div x-data="{
+        open: false, 
+        name: 'Brad',
+        search: '',
+        posts: [
+          {title: 'Post One'},
+          {title: 'Post Two'},
+          {title: 'Post Three'},
+          {title: 'Post Four'},
+        ]
+      }">
+      <!-- x-on - Listen for browser events on an element -->
+      <!-- You can also use @click -->
+      <!-- x-bind - Dynamically set HTML attributes on an element -->
+      <!-- You can also use :class -->
+      <!--       <button x-on:click="open = !open" x-bind:class="open ? 'bg-blue-800' : 'bg-slate-700'">
+        Toggle
+      </button> -->
+      <label>
+        <input type="checkbox" role="switch" x-model="open">Show Text
+      </label>
+
+      <!-- x-show - Toggle the visibility of an element-->
+      <div x-show="open" x-transition x-cloak>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat
+          quos laboriosam, minus rerum molestias soluta nisi nulla eos error
+          nihil.
+        </p>
+      </div>
+
+      <!-- x-text - Set the text content of an element / display data -->
+      <div>
+        The value of name is <span x-text="name" style="font-weight:bold"></span>
+      </div>
+
+      <!-- x-effect - Execute a script each time one of its dependancies change -->
+      <div x-effect="console.log(`x-effect ${open}`)"></div>
+
+      <!-- x-model - Synchronize a piece of data with an input element -->
+      <input x-model="search" type="text" placeholder="Search for something..." />
+      <p>
+        <span>Searching for:</span>
+        <span x-text="search"></span>
+      </p>
+
+      <!-- x-if - Conditionally add/remove a block of HTML from the page entirely -->
+      <template x-if="open">
+        <div>Template based on a condition</div>
+      </template>
+
+      <!-- x-for - Loop over an array of data -->
+      <h3>Posts</h3>
+      <template x-for="post in posts">
+        <div x-text="post.title"></div>
+      </template>
+      <button @click="posts.push({title: 'New Post'})">
+        Add Post
+      </button>
+
+      <div>
+        <!-- x-ref - Reference elements directly by their specified keys using the $refs magic property -->
+        <div x-ref="text">Hello World</div>
+
+        <button @click="$refs.text.append('.')">
+          Click
+        </button>
+      </div>
+
+      <!-- x-html - Set the inner HTML of an element -->
+      <div x-html="(await axios.get('./partial.html')).data">...</div>
+
+      <!-- $el - Reference the current DOM element -->
+      <button @click="$el.innerHTML = 'Hello World'">
+        Replace Text
+      </button>
+
+      <!-- x-init - run on init -->
+      <!-- $watch - Watch a component property -->
+      <div x-init="$watch('posts', value => console.log(value))"></div>
+
+      <!-- $dispatch - Shortcut for dispatching browser events -->
+      <div @notify="alert('You have been notified!')">
+        <button @click="$dispatch('notify')">
+          Notify
+        </button>
+      </div>
+
+      <!-- $data - Gives access to current Alpine data scope -->
+      <button @click="getLatestPost($data.posts)">
+        Get Latest Post
+      </button>
+
+      <!-- x-mask - plugin allows you to automatically format a text input field as a user types -->
+      <div>
+        <label for="mask">Enter a date</label>
+        <input name="mask" x-mask="99/99/9999" placeholder="MM/DD/YYYY" />
+      </div>
+    </div>
+    </div>
+
+    <!-- Stores: Dark Mode -->
+    <!--   <section x-data :style="$store.darkMode.on ? { color: 'red'} : { color: 'orange'} "> -->
+    <article x-data :data-theme="$store.darkMode.on ? 'dark' : 'light'">
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis, reiciendis
+        ipsa. Sed, illo, repellat ipsam, perspiciatis soluta labore quasi in eos
+        hic harum praesentium perferendis? Dignissimos, unde provident voluptas,
+        ad neque ea tempora nam ratione eligendi modi laudantium, iusto officia.
+      </p>
+      <button @click="$store.darkMode.toggle()">
+        Toggle Dark Mode
+      </button>
+      <a href="#" role="button" class="outline" @click.prevent="$store.darkMode.toggle()">Toggle Dark Mode</a>
+    </article>
+  </main>
+
+  <footer x-data class="container">
+    <p>Copyright &copy; <span x-text="new Date().getFullYear()"></span></p>
+  </footer>
+  <!--   <script src="script.js"/> -->
+  <script>
+    function getLatestPost(posts) {
+      console.log(posts.slice(-1).pop())
+    }
+
+    document.addEventListener("alpine:init", () => {
+      Alpine.store("darkMode", {
+        on: false,
+
+        toggle() {
+          this.on = !this.on;
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>
